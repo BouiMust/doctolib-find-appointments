@@ -1,24 +1,24 @@
 from time import sleep
-
 from playwright.sync_api import sync_playwright
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.app import App
 from kivy.metrics import dp
 from kivy.uix.scrollview import ScrollView
-
+from nava import play, stop
 
 # User Parameter __MUST BE CHANGED__
-visit_motive_ids = "6173632"
-agenda_ids = "911897"
-practice_ids = "305106"
+# For Cabinet Tour Mercure https://www.doctolib.fr/cabinet-medical/mantes-la-jolie/cabinet-medical-mantes-la-jolie
+visit_motive_ids = "2363648"
+agenda_ids = "375237-375239-375240-375244-375753" # 375237=badaoui, 375240=merfoud, 375237-375239-375240-375244-375753=all
+practice_ids = "149047"
 telehealth = "false"
 
 # Optional User Parameters
-days = 8
-minutes = 60
+days = 6
+minutes = 2
 
 
 class Doctolib(App):
@@ -84,7 +84,13 @@ while True:
         # Check for available appointments
         available_days = check_available_appointments(data)
         if available_days:
+            # Play alarm
+            sound_id = play("alarm.wav", async_mode=True)
+            sleep(4)
+            stop(sound_id)
+            print('Go https://www.doctolib.fr/cabinet-medical/mantes-la-jolie/cabinet-medical-mantes-la-jolie/booking/practitioners?specialityId=2&telehealth=false&placeId=practice-149047&isNewPatient=false&isNewPatientBlocked=false&motiveIds%5B%5D=2363648&bookingFunnelSource=profile')
             Doctolib(available_days).run()
             exit(0)
-        print(f"No available appointments found in the next {days} day(s)")
+        time_now = datetime.now().strftime("%H:%M:%S")
+        print(f"At {time_now} : no available appointments found in the next {days} day(s)")
     sleep(60 * minutes)
